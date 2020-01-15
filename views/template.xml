@@ -44,18 +44,26 @@
            
                     <div style="margin:20px;" class="d-flex justify-content-center">
                         <input class="easyui-datebox" label="&#160;Start Date:" style="width:30%;" />
-                        <!-- <p style="color:white">...</p> -->
                         <input class="easyui-datebox" label="&#160;End Date:" style="width:30%;" />
                     </div>
                     <div style="margin:20px;" class="d-flex justify-content-center">
-                        <select class="easyui-combobox" name="Company" label="&#160;Company :" style="width:30%">
-                            <option value="PaL">My Company</option>
-                            <option value="BS">Companyku</option>
-                        </select>
-                        <select class="easyui-combobox" name="Report" label="&#160;Report :" style="width:30%">
-                            <option value="PaL">Profit and Loss</option>
-                            <option value="BS">Balance Sheet</option>
-                        </select>
+                        <input field="company" class="easyui-combotree" data-options="
+                            url:'/financial/company',
+                            method:'get',
+                            valueField:'id',
+                            textField:'name',
+                            required:true,
+                            label:'&#160;Company :'" style="width:30%" />
+
+                        <input field="report" class="easyui-combotree" data-options="
+                            url:'/financial/report',
+                            method:'get',
+                            valueField:'id',
+                            textField:'name',
+                            required:true,
+                            label:'&#160;Report :'" style="width:30%" />
+
+                
                     </div>
                
         </template>

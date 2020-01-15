@@ -13,13 +13,39 @@ class financialStatement(http.Controller):
     def index(self, **kw):
         return http.request.render('vit_financial_statements.index', {
         })
+        
+    @http.route('/financial/company', auth='public', csrf=False)
+    def get_company(self):
+        company = http.request.env['res.company'].search_read([], fields=['id','name'])
+        data= []
+        for dir in company :
+            data.append({
+                'id': dir['id'],
+                'text': dir['name'],
+            })
+            
+        return simplejson.dumps(data)  
+      
+    @http.route('/financial/report', auth='public', csrf=False)
+    def get_report(self):
+        report = http.request.env['vit_financial_statements'].search_read([('parent_id','=', False)], fields=['id','name'])
+        data= []
+        for dir in report :
+            data.append({
+                'id': dir['id'],
+                'text': dir['name'],
+            })
+            
+        return simplejson.dumps(data)  
 
 
     @http.route('/financial/data', auth='public')
     def directories(self, **kw):
-        
+      
+
         
         if 'id' in kw:
+            directory_id = int(kw['id'])
             sql2 = """
                 WITH RECURSIVE parent (id, parent_id, code, name, level, criteria, source) AS (
                 SELECT
@@ -105,21 +131,14 @@ class financialStatement(http.Controller):
 
             cr2.execute(sql2)
             result2 = cr2.dictfetchall()
-          
-          
-            data=[]
+            result = []
+
             
-            for dir in result2:
-                    data.append({
-                          'id': dir['id_first'] + 1000,
-                          'name': dir['name'],
-                          'state': 'open',
-                          'parentId': dir['id_first'],
-                          'balance' :dir['balance'],
-                      })
+            
             
         else:
-            """ ///////////////////////////////////////////////////////////////////////////////////////"""
+            directory_id = False
+            
             
             sql =""" WITH RECURSIVE parent (id, parent_id, code, name, level, criteria, source) AS (
                 SELECT
@@ -179,23 +198,31 @@ class financialStatement(http.Controller):
 
             cr.execute(sql)
             result = cr.dictfetchall()
-            
-            """ ///////////////////////////////////////////////////////////////////////////////////////"""
-            
+            result2 = []
             
             
-            data=[]
+            
+            
+        data=[]
 
-            for dir in result:
-                    data.append({
-                          'id': dir['id_first'],
-                          'name': dir['parent_name'],
-                          'state': 'closed',
-                          'parentId': dir['parent_id'],
-                      })
+        for dir in result:
+            data.append({
+                  'id': dir['id_first'],
+                  'name': dir['parent_name'],
+                  'state': 'closed',
+                  'parentId': str(directory_id),
+              })
+        for dir in result2:
+            parent_id = dir['id_first']
+            _logger.info(directory_id)
+            _logger.info(parent_id)
+            if directory_id == parent_id :
+              data.append({
+                    'id': dir['id_first'],
+                    'name': dir['name'],
+                    'state': 'open',
+                    'parentId': parent_id,
+                    'balance' :dir['balance'],
+                })
             
-                    
-                    
-     
-
         return simplejson.dumps(data)
