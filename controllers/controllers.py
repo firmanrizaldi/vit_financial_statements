@@ -218,12 +218,13 @@ class financialStatement(http.Controller):
         data=[]
 
         for dir in result:
-          
+            balance = 0
             idlevel1 = dir['id_first']
           
             sql3 = """
             SELECT
                     vfs.id,
+                    vfs.code,
                     vfs.name as parent_name,
                     ( select 
                             case 
@@ -268,8 +269,46 @@ class financialStatement(http.Controller):
             
           
             for dirs in result3 :
-              balance = dirs['balance']
+              if dirs['code'] == 'sale' :
+                balance_sales = dirs['balance']
+              else :
+                balance_sales = 0
+                
+              if dirs['code'] == 'HPP'  :
+                balance_COGS = dirs['balance']
+              else :
+                balance_COGS = 0
+                
+              if dirs['code'] == 'ADM' :
+                balance_admin = dirs['balance']
+              else :
+                balance_admin = 0
+                
+              if dirs['code'] == 'OTHER' :
+                balance_other = dirs['balance']
+              else :
+                balance_other = 0
+# ///////////////////////////////////////////////////////////////////////////////
+                
+            if balance_sales != 0 :
+              balance_sales_nilai = balance_sales
  
+            if balance_COGS != 0 :
+              balance_COGS_nilai = balance_COGS
+              
+            if balance_admin != 0 :
+              balance_admin_nilai = balance_admin
+              
+            if balance_other != 0 :
+              balance_other_nilai = balance_other
+              
+            if dirs['code'] == 'GROSS' :
+              balance = balance_sales_nilai + balance_COGS_nilai
+            elif dirs['code'] == 'NP' :
+              balance = (balance_sales_nilai + balance_COGS_nilai) + balance_admin - balance_other
+            else :
+              balance = dirs['balance']
+              
             data.append({
                   'id': dir['id_first'],
                   'name': dir['parent_name'],
