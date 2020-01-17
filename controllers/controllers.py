@@ -40,11 +40,25 @@ class financialStatement(http.Controller):
 
 
     @http.route('/financial/data', auth='public')
-    def directories(self, **kw):
+    def directories(self,**kw):
       
+        if 'report_id' in kw:
+          report_id = kw['report_id']
+        else :
+          report_id = 0
 
+        if 'company_id' in kw:
+          company_id = kw['company_id']
+          
+        if 'date_start' in kw:
+          date_start = datetime.datetime.strptime(kw['date_start'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
+
+          
+        if 'date_end' in kw:
+          date_end = datetime.datetime.strptime(kw['date_end'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
         
         if 'id' in kw:
+          
             directory_id = int(kw['id'])
             sql2 = """
                 WITH RECURSIVE parent (id, parent_id, code, name, level, criteria, source) AS (
@@ -61,7 +75,7 @@ class financialStatement(http.Controller):
                   vit_financial_statements as line
                 WHERE
                   line.parent_id is NULL
-                  AND line.id = 1
+                  AND line.id = %s
                 UNION ALL
                   SELECT
                     child.id,
@@ -98,13 +112,13 @@ class financialStatement(http.Controller):
                     parent
                     LEFT JOIN account_account aa  
                       on aa.code like parent.criteria
-                      and aa.company_id = 1
+                      and aa.company_id = %s
                           LEFT join account_account_type aat 
                       on aat.id = aa.user_type_id
 
                     LEFT join account_move_line aml 
                       on aml.account_id = aa.id
-                        and aml.date between '2019-01-01' and '2020-12-01'
+                        and aml.date between %s and %s
 
                     LEFT join account_move am
                         on aml.move_id = am.id 
@@ -128,14 +142,11 @@ class financialStatement(http.Controller):
             """
             
             cr2 = http.request.env.cr
-
-            cr2.execute(sql2)
+            
+            cr2.execute(sql2, (report_id,company_id,date_start,date_end))
             result2 = cr2.dictfetchall()
             result = []
-
-            
-            
-            
+   
         else:
             directory_id = False
             
@@ -154,7 +165,7 @@ class financialStatement(http.Controller):
                   vit_financial_statements as line
                 WHERE
                   line.parent_id is NULL
-                  AND line.id = 1
+                  AND line.id = %s
                 UNION ALL
                   SELECT
                      child.id,
@@ -196,7 +207,7 @@ class financialStatement(http.Controller):
             
             cr = http.request.env.cr
 
-            cr.execute(sql)
+            cr.execute(sql,(report_id,))
             result = cr.dictfetchall()
             result2 = []
             
@@ -214,8 +225,6 @@ class financialStatement(http.Controller):
               })
         for dir in result2:
             parent_id = dir['id_first']
-            _logger.info(directory_id)
-            _logger.info(parent_id)
             if directory_id == parent_id :
               data.append({
                     'id': dir['id_first'],
