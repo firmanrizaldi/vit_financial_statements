@@ -23,11 +23,12 @@
                                 date_start: $('#date_start').val(),
                                 date_end: $('#date_end').val()
                             });
+                        }
 
+                        function expandAll(){
+                            $('#tt').treegrid('expandAll');
+                        }
                             
-
-
-                    }
 
                 </script>
             </t>
@@ -53,8 +54,8 @@
         <template id="vit_financial_statements.file_form">
      
                     <div style="margin:20px;" class="d-flex justify-content-center">
-                        <input class="easyui-datebox" label="&#160;Start Date:" style="width:30%;" id="date_start" required="1"/>
-                        <input class="easyui-datebox" label="&#160;End Date:" style="width:30%;" id="date_end" required="1"/>
+                        <input class="easyui-datebox" label="&#160;Start Date:" style="width:20%;" id="date_start" required="1"/>
+                        <input class="easyui-datebox" label="&#160;End Date:" style="width:20%;" id="date_end" required="1"/>
                         <input field="company" class="easyui-combotree" data-options="
                             url:'/financial/company',
                             method:'get',
@@ -64,7 +65,7 @@
                             label:'&#160;Company :'
                             " 
                             
-                            style="width:30%" id="company_id"/>
+                            style="width:20%" id="company_id"/>
 
                         <input field="report" class="easyui-combotree" data-options="
                             url:'/financial/report',
@@ -73,13 +74,13 @@
                             idField: 'report_id',
                             textField:'name',
                             required:true,
-                            label:'&#160;Report :'" style="width:30%" id="report_id"/>
+                            label:'&#160;Report :'" style="width:20%" id="report_id"/>
 
                         
                     </div>
-                    <div style="margin:20px;" class="d-flex justify-content-center">
-                        <button type="button" class="btn btn-primary" onclick="doSearch()">Search</button>
-                       <!-- <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" onclick="doSearch()">Search</a> -->
+                    <div style="margin:20px ;" class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-primary" style="margin:20px;" onclick="doSearch()">Search</button>
+                        <button type="button" class="btn btn-info" style="margin:20px;" onclick="expandAll()">Expand All</button>
                     </div>
                
         </template>

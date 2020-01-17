@@ -56,6 +56,7 @@ class financialStatement(http.Controller):
           
         if 'date_end' in kw:
           date_end = datetime.datetime.strptime(kw['date_end'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
+
         
         if 'id' in kw:
           
@@ -217,12 +218,66 @@ class financialStatement(http.Controller):
         data=[]
 
         for dir in result:
+          
+            idlevel1 = dir['id_first']
+          
+            sql3 = """
+            SELECT
+                    vfs.id,
+                    vfs.name as parent_name,
+                    ( select 
+                            case 
+                            when aat.name in ('Income','Other Income','Equity','Payable','Credit Card','Current Liabilities','Non-current Liabilities') then
+                                sum(coalesce(aml.credit,0) - coalesce(aml.debit,0)) 
+                            else
+                                sum(coalesce(aml.debit,0) - coalesce(aml.credit,0))
+                            end 
+                    FROM
+                    vit_financial_statements vfs
+                    
+                    LEFT JOIN account_account aa  
+                      on aa.code like vfs.criteria
+                      and aa.company_id = 1
+                          LEFT join account_account_type aat 
+                      on aat.id = aa.user_type_id
+
+                    LEFT join account_move_line aml 
+                      on aml.account_id = aa.id
+                        and aml.date between '2019-01-01' and '2020-12-01'
+
+                    LEFT join account_move am
+                        on aml.move_id = am.id 
+                        and am.state = 'posted'
+
+                    where vfs.id = %s
+                        group by 
+                            aat.name
+                            ) as balance
+                    
+                    FROM
+                        vit_financial_statements vfs
+
+                    where vfs.id = %s
+            
+            """
+
+            cr3 = http.request.env.cr
+
+            cr3.execute(sql3, (idlevel1, idlevel1,))
+            result3 = cr3.dictfetchall()
+            
+          
+            for dirs in result3 :
+              balance = dirs['balance']
+ 
             data.append({
                   'id': dir['id_first'],
                   'name': dir['parent_name'],
                   'state': 'closed',
                   'parentId': str(directory_id),
+                  'balance' : balance
               })
+            
         for dir in result2:
             parent_id = dir['id_first']
             if directory_id == parent_id :
@@ -233,5 +288,8 @@ class financialStatement(http.Controller):
                     'parentId': parent_id,
                     'balance' :dir['balance'],
                 })
+            
+            
+            
             
         return simplejson.dumps(data)
