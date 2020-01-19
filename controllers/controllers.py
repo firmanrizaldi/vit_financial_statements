@@ -42,22 +42,11 @@ class financialStatement(http.Controller):
     @http.route('/financial/data', auth='public')
     def directories(self,**kw):
       
-        if 'report_id' in kw:
-          report_id = kw['report_id']
-        else :
-          report_id = 0
+        report_id = kw['report_id'] if 'report_id' in kw else 0
+        company_id = kw['company_id'] if 'company_id' in kw  else 0
+        date_start = datetime.datetime.strptime(kw['date_start'], '%m/%d/%Y').strftime('%Y/%m/%d') if 'date_start' in kw else 0
+        date_end = datetime.datetime.strptime(kw['date_end'], '%m/%d/%Y').strftime('%Y/%m/%d') if 'date_end' in kw else 0
 
-        if 'company_id' in kw:
-          company_id = kw['company_id']
-          
-        if 'date_start' in kw:
-          date_start = datetime.datetime.strptime(kw['date_start'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
-
-          
-        if 'date_end' in kw:
-          date_end = datetime.datetime.strptime(kw['date_end'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
-
-        
         if 'id' in kw:
           
             directory_id = int(kw['id'])
@@ -151,7 +140,6 @@ class financialStatement(http.Controller):
         else:
             directory_id = False
             
-            
             sql =""" WITH RECURSIVE parent (id, parent_id, code, name, level, criteria, source) AS (
                 SELECT
                   line.id,
@@ -211,10 +199,7 @@ class financialStatement(http.Controller):
             cr.execute(sql,(report_id,))
             result = cr.dictfetchall()
             result2 = []
-            
-            
-            
-            
+   
         data=[]
 
         for dir in result:
@@ -269,47 +254,17 @@ class financialStatement(http.Controller):
             
           
             for dirs in result3 :
-              if dirs['code'] == 'sale' :
-                balance_sales = dirs['balance']
-              else :
-                balance_sales = 0
-                
-              if dirs['code'] == 'HPP'  :
-                balance_COGS = dirs['balance']
-              else :
-                balance_COGS = 0
-                
-              if dirs['code'] == 'ADM' :
-                balance_admin = dirs['balance']
-              else :
-                balance_admin = 0
-                
-              if dirs['code'] == 'OTHER' :
-                balance_other = dirs['balance']
-              else :
-                balance_other = 0
-# ///////////////////////////////////////////////////////////////////////////////
-                
-            if balance_sales != 0 :
-              balance_sales_nilai = balance_sales
-            else :
-              balance_sales_nilai = 0
- 
-            if balance_COGS != 0 :
-              balance_COGS_nilai = balance_COGS
-            else :
-              balance_COGS_nilai = 0
-                  
-            if balance_admin != 0 :
-              balance_admin_nilai = balance_admin
-            else :
-              balance_admin_nilai = 0
-                
-            if balance_other != 0 :
-              balance_other_nilai = balance_other
-            else :
-              balance_other_nilai = 0
-                
+       
+              balance_sales = dirs['balance'] if dirs['code'] == 'sale' else  0
+              balance_COGS = dirs['balance'] if dirs['code'] == 'HPP' else  0
+              balance_admin = dirs['balance'] if dirs['code'] == 'ADM' else  0
+              balance_other = dirs['balance'] if dirs['code'] == 'OTHER' else  0
+         
+            balance_sales_nilai = balance_sales if balance_sales != 0  else  0
+            balance_COGS_nilai = balance_COGS if balance_COGS != 0 else  0
+            balance_admin_nilai = balance_admin if balance_admin != 0 else  0   
+            balance_other_nilai = balance_other if balance_other != 0 else  0
+              
             if dirs['code'] == 'GROSS' :
               balance = balance_sales_nilai + balance_COGS_nilai
             elif dirs['code'] == 'NP' :
