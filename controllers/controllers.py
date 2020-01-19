@@ -42,10 +42,20 @@ class financialStatement(http.Controller):
     @http.route('/financial/data', auth='public')
     def directories(self,**kw):
       
-        report_id = kw['report_id'] if 'report_id' in kw else 0
-        company_id = kw['company_id'] if 'company_id' in kw  else 0
-        date_start = datetime.datetime.strptime(kw['date_start'], '%m/%d/%Y').strftime('%Y/%m/%d') if 'date_start' in kw else 0
-        date_end = datetime.datetime.strptime(kw['date_end'], '%m/%d/%Y').strftime('%Y/%m/%d') if 'date_end' in kw else 0
+        if 'report_id' in kw:
+          report_id = kw['report_id']
+        else :
+          report_id = 0
+
+        if 'company_id' in kw:
+          company_id = kw['company_id']
+          
+        if 'date_start' in kw:
+          date_start = datetime.datetime.strptime(kw['date_start'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
+
+          
+        if 'date_end' in kw:
+          date_end = datetime.datetime.strptime(kw['date_end'], '%m/%d/%Y').strftime('%Y/%m/%d') # merubah format tanggal
 
         if 'id' in kw:
           
@@ -279,7 +289,8 @@ class financialStatement(http.Controller):
                   'parentId': str(directory_id),
                   'balance' : balance
               })
-            
+          
+        # _logger.info(result2)  
         for dir in result2:
             parent_id = dir['id_first']
             if directory_id == parent_id :
