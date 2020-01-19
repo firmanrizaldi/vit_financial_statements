@@ -43,7 +43,7 @@
                         idField: 'id',
                         treeField: 'name' ">
                  <thead>
-                     <tr>
+                     <tr data-options="iconCls:'icon-ok'">
                         <th data-options="field:'name'" width="80%">Name</th>
                         <th data-options="field:'balance'" width="20%">Balance</th>
                      </tr>
@@ -81,6 +81,7 @@
                     <div style="margin:20px ;" class="d-flex justify-content-center">
                         <button type="button" class="btn btn-primary" style="margin:20px;" onclick="doSearch()">Search</button>
                         <button type="button" class="btn btn-info" style="margin:20px;" onclick="expandAll()">Expand All</button>
+                        <button type="button" class="btn btn-success" style="margin:20px;" onclick="print()">Print</button>
                     </div>
                
         </template>

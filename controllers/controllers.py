@@ -274,7 +274,8 @@ class financialStatement(http.Controller):
             balance_COGS_nilai = balance_COGS if balance_COGS != 0 else  0
             balance_admin_nilai = balance_admin if balance_admin != 0 else  0   
             balance_other_nilai = balance_other if balance_other != 0 else  0
-              
+            
+            
             if dirs['code'] == 'GROSS' :
               balance = balance_sales_nilai + balance_COGS_nilai
             elif dirs['code'] == 'NP' :
@@ -289,8 +290,7 @@ class financialStatement(http.Controller):
                   'parentId': str(directory_id),
                   'balance' : balance
               })
-          
-        # _logger.info(result2)  
+            
         for dir in result2:
             parent_id = dir['id_first']
             if directory_id == parent_id :
