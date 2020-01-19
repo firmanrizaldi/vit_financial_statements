@@ -28,5 +28,7 @@
         'views/menu.xml',
         'views/template.xml',
         'views/assets.xml',
+        'data/vit_financial_statements.csv',
+        'data2/vit_financial_statements.csv',
     ],
 }

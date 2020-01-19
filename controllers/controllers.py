@@ -292,20 +292,28 @@ class financialStatement(http.Controller):
                 
             if balance_sales != 0 :
               balance_sales_nilai = balance_sales
+            else :
+              balance_sales_nilai = 0
  
             if balance_COGS != 0 :
               balance_COGS_nilai = balance_COGS
-              
+            else :
+              balance_COGS_nilai = 0
+                  
             if balance_admin != 0 :
               balance_admin_nilai = balance_admin
-              
+            else :
+              balance_admin_nilai = 0
+                
             if balance_other != 0 :
               balance_other_nilai = balance_other
-              
+            else :
+              balance_other_nilai = 0
+                
             if dirs['code'] == 'GROSS' :
               balance = balance_sales_nilai + balance_COGS_nilai
             elif dirs['code'] == 'NP' :
-              balance = (balance_sales_nilai + balance_COGS_nilai) + balance_admin - balance_other
+              balance = (balance_sales_nilai + balance_COGS_nilai) + balance_admin_nilai - balance_other_nilai
             else :
               balance = dirs['balance']
               
